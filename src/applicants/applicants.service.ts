@@ -7,15 +7,33 @@ export class ApplicantsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
   async create(createApplicantDto: Prisma.ApplicantCreateInput) {
-    return this.databaseService.applicant.create({ data: createApplicantDto });
+    return this.databaseService.applicant.create({
+      data: {
+        ...createApplicantDto,
+        applicantRole: {
+          connect: { id: Number(createApplicantDto.applicantRole) },
+        },
+      },
+    });
   }
 
   async findAll() {
-    return this.databaseService.applicant.findMany({});
+    return this.databaseService.applicant.findMany({
+      include: {
+        applicantRole: { select: { id: true, description: true } },
+        applicantStatus: { select: { id: true, description: true } },
+      },
+    });
   }
 
   async findOne(id: number) {
-    return this.databaseService.applicant.findUnique({ where: { id } });
+    return this.databaseService.applicant.findUnique({
+      where: { id },
+      include: {
+        applicantRole: { select: { id: true, description: true } },
+        applicantStatus: { select: { id: true, description: true } },
+      },
+    });
   }
 
   async update(id: number, updateApplicantDto: Prisma.ApplicantUpdateInput) {
