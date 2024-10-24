@@ -1,0 +1,15 @@
+-- CreateTable
+CREATE TABLE `Applicant` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `phoneNumber` INTEGER NOT NULL,
+    `yoe` INTEGER NOT NULL,
+    `location` VARCHAR(191) NOT NULL,
+    `resumeLink` VARCHAR(191) NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    UNIQUE INDEX `Applicant_email_key`(`email`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
