@@ -21,7 +21,29 @@ model Applicant {
   yoe Int 
   location String
   resumeLink String
-
   createdAt  DateTime  @default(now()) 
-  updatedAt  DateTime  @updatedAt            
+  updatedAt  DateTime  @updatedAt   
+  
+  applicantRole        ApplicantRole?  @relation(fields: [applicantRoleId], references: [id])
+  applicantRoleId      Int?   
+  
+  
+  applicantStatus      ApplicantStatus? @relation(fields: [applicantStatusId], references: [id])
+  applicantStatusId    Int?                    
+}
+
+model ApplicantRole {
+  id    Int    @id @default(autoincrement())
+  description String @unique
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  applicants   Applicant[]   
+}
+
+model ApplicantStatus {
+  id    Int    @id @default(autoincrement())
+  description String @unique
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  applicants   Applicant[]   
 }
