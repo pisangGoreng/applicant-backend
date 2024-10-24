@@ -1,5 +1,6 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { handleError } from 'src/common/utils/error-handler';
 
 @Injectable()
 export class DatabaseService extends PrismaClient implements OnModuleInit {
@@ -31,19 +32,29 @@ export class DatabaseService extends PrismaClient implements OnModuleInit {
    */
   private createApplicantMiddleware() {
     this.$use(async (params, next) => {
-      if (params.model === 'Applicant' && params.action === 'create') {
-        const appliedStatus = await this.applicantStatus.findUnique({
-          where: { description: 'applied' },
-        });
+      try {
+        if (params.model === 'Applicant' && params.action === 'create') {
+          const appliedStatus = await this.applicantStatus.findUnique({
+            where: { description: 'applied' },
+          });
 
-        if (!params.args.data.applicantStatus && appliedStatus) {
-          params.args.data.applicantStatus = {
-            connect: { id: appliedStatus.id },
-          };
+          if (!appliedStatus) {
+            throw new NotFoundException(
+              `Status with description "applied" not found`,
+            );
+          }
+
+          if (!params.args.data.applicantStatus && appliedStatus) {
+            params.args.data.applicantStatus = {
+              connect: { id: appliedStatus.id },
+            };
+          }
         }
-      }
 
-      return next(params);
+        return next(params);
+      } catch (error) {
+        handleError(error);
+      }
     });
   }
 }

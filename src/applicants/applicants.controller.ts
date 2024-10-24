@@ -6,22 +6,24 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ApplicantsService } from './applicants.service';
 import { Prisma } from '@prisma/client';
+import { GetApplicantsDto } from './dto/get-applicants.dto';
 
 @Controller('applicants')
 export class ApplicantsController {
   constructor(private readonly applicantsService: ApplicantsService) {}
 
   @Post()
-  create(@Body() createApplicantDto: Prisma.ApplicantCreateInput) {
-    return this.applicantsService.create(createApplicantDto);
+  async create(@Body() createApplicantDto: Prisma.ApplicantCreateInput) {
+    return await this.applicantsService.create(createApplicantDto);
   }
 
   @Get()
-  findAll() {
-    return this.applicantsService.findAll();
+  findAll(@Query() queryPagination: GetApplicantsDto) {
+    return this.applicantsService.findAll(queryPagination);
   }
 
   @Get(':id')

@@ -27,9 +27,10 @@ model Applicant {
   applicantRole        ApplicantRole?  @relation(fields: [applicantRoleId], references: [id])
   applicantRoleId      Int?   
   
-  
   applicantStatus      ApplicantStatus? @relation(fields: [applicantStatusId], references: [id])
-  applicantStatusId    Int?                    
+  applicantStatusId    Int?   
+
+  @@unique([email, phoneNumber]) 
 }
 
 model ApplicantRole {
