@@ -12,8 +12,8 @@ import { handleError } from 'src/common/utils/error-handler';
 export class ApplicantsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async validateUniqueField(createApplicantDto: Prisma.ApplicantCreateInput) {
-    const { email, phoneNumber } = createApplicantDto;
+  async validateUniqueField(createApplicant: Prisma.ApplicantCreateInput) {
+    const { email, phoneNumber } = createApplicant;
     const existingApplicant = await this.databaseService.applicant.findFirst({
       where: {
         OR: [{ email }, { phoneNumber }],
@@ -33,10 +33,10 @@ export class ApplicantsService {
     }
   }
 
-  async create(createApplicantDto: Prisma.ApplicantCreateInput) {
+  async create(createApplicant: Prisma.ApplicantCreateInput) {
     try {
-      await this.validateUniqueField(createApplicantDto);
-      const { applicantRole } = createApplicantDto;
+      await this.validateUniqueField(createApplicant);
+      const { applicantRole } = createApplicant;
 
       const isRoleExist = await this.databaseService.applicantRole.findUnique({
         where: { id: Number(applicantRole) },
@@ -47,7 +47,7 @@ export class ApplicantsService {
 
       const createdApplicant = await this.databaseService.applicant.create({
         data: {
-          ...createApplicantDto,
+          ...createApplicant,
           ...(applicantRole && {
             applicantRole: { connect: { id: Number(applicantRole) } },
           }),
@@ -130,9 +130,9 @@ export class ApplicantsService {
     }
   }
 
-  async update(id: number, updateApplicantDto: Prisma.ApplicantUpdateInput) {
+  async update(id: number, updateApplicant: Prisma.ApplicantUpdateInput) {
     try {
-      const { applicantRole, applicantStatus } = updateApplicantDto;
+      const { applicantRole, applicantStatus } = updateApplicant;
       const { applicant } = this.databaseService;
 
       const existingApplicant = await applicant.findUnique({ where: { id } });
@@ -143,7 +143,7 @@ export class ApplicantsService {
       const updatedApplicant = await applicant.update({
         where: { id },
         data: {
-          ...updateApplicantDto,
+          ...updateApplicant,
           ...(applicantRole && {
             applicantRole: { connect: { id: Number(applicantRole) } },
           }),
