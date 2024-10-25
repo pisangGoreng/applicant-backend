@@ -11,6 +11,7 @@ import {
 import { ApplicantsService } from './applicants.service';
 import { Prisma } from '@prisma/client';
 import { GetApplicantsDto } from './dto/get-applicants.dto';
+import { ApiResponse } from 'src/common/utils/api-response';
 
 @Controller('applicants')
 export class ApplicantsController {
@@ -18,29 +19,54 @@ export class ApplicantsController {
 
   @Post()
   async create(@Body() createApplicantDto: Prisma.ApplicantCreateInput) {
-    return await this.applicantsService.create(createApplicantDto);
+    return new ApiResponse(
+      true,
+      'Applicant created successfully',
+      await this.applicantsService.create(createApplicantDto),
+      false,
+    );
   }
 
   @Get()
-  findAll(@Query() queryPagination: GetApplicantsDto) {
-    return this.applicantsService.findAllByQuery(queryPagination);
+  async findAll(@Query() queryPagination: GetApplicantsDto) {
+    return new ApiResponse(
+      true,
+      'All Applicant fetched successfully',
+      await this.applicantsService.findAllByQuery(queryPagination),
+      false,
+    );
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.applicantsService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return new ApiResponse(
+      true,
+      'Applicant fetched successfully',
+      await this.applicantsService.findOne(+id),
+      false,
+    );
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateApplicantDto: Prisma.ApplicantUpdateInput,
   ) {
-    return this.applicantsService.update(+id, updateApplicantDto);
+    return new ApiResponse(
+      true,
+      'Applicant updated successfully',
+      await this.applicantsService.update(+id, updateApplicantDto),
+      false,
+    );
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.applicantsService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return new ApiResponse(
+      true,
+      'Applicant deleted successfully',
+      await this.applicantsService.remove(+id),
+      false,
+    );
   }
 }

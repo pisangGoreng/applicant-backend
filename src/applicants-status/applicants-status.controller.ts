@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApplicantsStatusService } from './applicants-status.service';
 import { Prisma } from '@prisma/client';
+import { ApiResponse } from 'src/common/utils/api-response';
 
 @Controller('applicants-status')
 export class ApplicantsStatusController {
@@ -17,30 +18,57 @@ export class ApplicantsStatusController {
   ) {}
 
   @Post()
-  create(@Body() createApplicantsStatusDto: Prisma.ApplicantStatusCreateInput) {
-    return this.applicantsStatusService.create(createApplicantsStatusDto);
+  async create(
+    @Body() createApplicantsStatusDto: Prisma.ApplicantStatusCreateInput,
+  ) {
+    return new ApiResponse(
+      true,
+      'Applicant Status created successfully',
+      await this.applicantsStatusService.create(createApplicantsStatusDto),
+      false,
+    );
   }
 
   @Get()
-  findAll() {
-    return this.applicantsStatusService.findAll();
+  async findAll() {
+    return new ApiResponse(
+      true,
+      'All Applicant Status fetched successfully',
+      await this.applicantsStatusService.findAll(),
+      false,
+    );
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.applicantsStatusService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return new ApiResponse(
+      true,
+      'Applicant Status fetched successfully',
+      await this.applicantsStatusService.findOne(+id),
+      false,
+    );
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateApplicantsStatusDto: Prisma.ApplicantStatusUpdateInput,
   ) {
-    return this.applicantsStatusService.update(+id, updateApplicantsStatusDto);
+    return new ApiResponse(
+      true,
+      'Applicant Status updated successfully',
+      await this.applicantsStatusService.update(+id, updateApplicantsStatusDto),
+      false,
+    );
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.applicantsStatusService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return new ApiResponse(
+      true,
+      'Applicant Status deleted successfully',
+      await this.applicantsStatusService.remove(+id),
+      false,
+    );
   }
 }

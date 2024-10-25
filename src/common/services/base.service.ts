@@ -14,30 +14,6 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
     private uniqueFields: string[],
   ) {}
 
-  // async validateUniqueField(
-  //   id,
-  //   data: Partial<CreateInput | UpdateInput>,
-  //   uniqueFields?: string[],
-  // ) {
-  //   const existingEntity = await this.model.findFirst({
-  //     where: { OR: [data] },
-  //   });
-
-  //   const duplicateFields: string[] = [];
-  //   for (const [key, value] of Object.entries(data)) {
-  //     if (existingEntity && existingEntity[key] === value) {
-  //       duplicateFields.push(key);
-  //     }
-  //   }
-
-  //   if (duplicateFields.length > 0) {
-  //     throw new ConflictException({
-  //       message: `${this.model.name}  with this data already exists`,
-  //       duplicateFields,
-  //     });
-  //   }
-  // }
-
   async validateUniqueField(
     id: number,
     updateApplicant: Partial<CreateInput | UpdateInput>,
@@ -80,12 +56,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
   async create(data: CreateInput) {
     try {
       await this.validateUniqueField(null, data, ['description']);
-      const createdData = await this.model.create({ data });
-
-      return {
-        message: `${this.model.name} created successfully`,
-        data: createdData,
-      };
+      return await this.model.create({ data });
     } catch (error) {
       handleError(error, null, this.model.name);
     }
@@ -93,12 +64,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
 
   async findAll() {
     try {
-      const existingData = await this.model.findMany();
-
-      return {
-        message: `${this.model.name} fetched successfully`,
-        data: existingData,
-      };
+      return await this.model.findMany();
     } catch (error) {
       handleError(error, null, this.model.name);
     }
@@ -114,10 +80,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
         );
       }
 
-      return {
-        message: `${this.model.name} fetched successfully`,
-        data: existingData,
-      };
+      return existingData;
     } catch (error) {
       handleError(error, id, this.model.name);
     }
@@ -125,24 +88,11 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
 
   async update(id: number, data: UpdateInput) {
     try {
-      // const existingData = await this.model.findUnique({ where: { id } });
-      // if (!existingData) {
-      //   throw new NotFoundException(
-      //     `${this.model.name} with ID ${id} not found`,
-      //   );
-      // }
-
       await this.validateUniqueField(id, data, ['description']);
-
-      const updatedExistingData = await this.model.update({
+      return await this.model.update({
         where: { id },
         data,
       });
-
-      return {
-        message: `${this.model.name} updated successfully`,
-        data: updatedExistingData,
-      };
     } catch (error) {
       handleError(error, id, this.model.name);
     }
@@ -150,12 +100,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
 
   async remove(id: number) {
     try {
-      const deletedExistingData = await this.model.delete({ where: { id } });
-
-      return {
-        message: `${this.model.name} deleted successfully`,
-        data: deletedExistingData,
-      };
+      return await this.model.delete({ where: { id } });
     } catch (error) {
       handleError(error, id, this.model.name);
     }

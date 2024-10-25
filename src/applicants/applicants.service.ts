@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Applicant, Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 import { GetApplicantsDto } from './dto/get-applicants.dto';
@@ -39,7 +34,7 @@ export class ApplicantsService extends BaseService<
 
       await this.applicantRoleService.findOne(Number(applicantRole));
 
-      const createdApplicant = await this.databaseService.applicant.create({
+      return await this.databaseService.applicant.create({
         data: {
           ...createApplicant,
           ...(applicantRole && {
@@ -48,10 +43,10 @@ export class ApplicantsService extends BaseService<
         },
       });
 
-      return {
-        message: 'Applicant created successfully',
-        data: createdApplicant,
-      };
+      // return {
+      //   message: 'Applicant created successfully',
+      //   data: createdApplicant,
+      // };
     } catch (error) {
       handleError(error, null, 'Applicant');
     }
@@ -112,10 +107,11 @@ export class ApplicantsService extends BaseService<
         throw new NotFoundException(`Applicant with ID ${id} not found`);
       }
 
-      return {
-        message: 'Applicant fetched successfully',
-        data: existingApplicant,
-      };
+      // return {
+      //   message: 'Applicant fetched successfully',
+      //   data: existingApplicant,
+      // };
+      return existingApplicant;
     } catch (error) {
       handleError(error, id, 'Applicant');
     }
@@ -130,7 +126,7 @@ export class ApplicantsService extends BaseService<
         this.uniqueFieldsModel,
       );
 
-      const updatedApplicant = await this.databaseService.applicant.update({
+      return await this.databaseService.applicant.update({
         where: { id },
         data: {
           ...updateApplicant,
@@ -143,51 +139,12 @@ export class ApplicantsService extends BaseService<
         },
       });
 
-      return {
-        message: 'Applicant updated successfully',
-        data: updatedApplicant,
-      };
+      // return {
+      //   message: 'Applicant updated successfully',
+      //   data: updatedApplicant,
+      // };
     } catch (error) {
       handleError(error, id, 'Applicant');
     }
   }
 }
-
-// async validateUniqueField(
-//   id,
-//   updateApplicant: Prisma.ApplicantUpdateInput | Prisma.ApplicantCreateInput,
-//   uniqueFields: string[],
-// ) {
-//   const [conditions, conditionsValue] = Object.entries(
-//     updateApplicant,
-//   ).reduce(
-//     (results, [key, value]) => {
-//       if (uniqueFields.includes(key)) {
-//         results[0].push({ [key]: value });
-//         results[1].push(value);
-//       }
-//       return results;
-//     },
-//     [[], []],
-//   );
-
-//   const existingApplicant = await this.databaseService.applicant.findMany({
-//     where: { OR: conditions, ...(id && { NOT: { id } }) },
-//   });
-
-//   const duplicateFields = existingApplicant.reduce((results, item) => {
-//     Object.entries(item).forEach(([key, value]) => {
-//       if (conditionsValue.includes(value)) {
-//         results.push(key);
-//       }
-//     });
-//     return results;
-//   }, []);
-
-//   if (duplicateFields.length > 0) {
-//     throw new ConflictException({
-//       message: 'Applicant with this data already exists.',
-//       duplicateFields,
-//     });
-//   }
-// }
