@@ -11,23 +11,67 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
   constructor(
     protected readonly prismaClient: PrismaClient,
     private model: any,
+    private uniqueFields: string[],
   ) {}
 
-  async validateUniqueField(uniqueFields: Partial<CreateInput>) {
-    const existingEntity = await this.model.findFirst({
-      where: { OR: [uniqueFields] },
+  // async validateUniqueField(
+  //   id,
+  //   data: Partial<CreateInput | UpdateInput>,
+  //   uniqueFields?: string[],
+  // ) {
+  //   const existingEntity = await this.model.findFirst({
+  //     where: { OR: [data] },
+  //   });
+
+  //   const duplicateFields: string[] = [];
+  //   for (const [key, value] of Object.entries(data)) {
+  //     if (existingEntity && existingEntity[key] === value) {
+  //       duplicateFields.push(key);
+  //     }
+  //   }
+
+  //   if (duplicateFields.length > 0) {
+  //     throw new ConflictException({
+  //       message: `${this.model.name}  with this data already exists`,
+  //       duplicateFields,
+  //     });
+  //   }
+  // }
+
+  async validateUniqueField(
+    id: number,
+    updateApplicant: Partial<CreateInput | UpdateInput>,
+    uniqueFields: string[],
+  ) {
+    const [conditions, conditionsValue] = Object.entries(
+      updateApplicant,
+    ).reduce(
+      (results, [key, value]) => {
+        if (uniqueFields.includes(key)) {
+          results[0].push({ [key]: value });
+          results[1].push(value);
+        }
+        return results;
+      },
+      [[], []],
+    );
+
+    const existingApplicant = await this.model.findMany({
+      where: { OR: conditions, ...(id && { NOT: { id } }) },
     });
 
-    const duplicateFields: string[] = [];
-    for (const [key, value] of Object.entries(uniqueFields)) {
-      if (existingEntity && existingEntity[key] === value) {
-        duplicateFields.push(key);
-      }
-    }
+    const duplicateFields = existingApplicant.reduce((results, item) => {
+      Object.entries(item).forEach(([key, value]) => {
+        if (conditionsValue.includes(value)) {
+          results.push(key);
+        }
+      });
+      return results;
+    }, []);
 
     if (duplicateFields.length > 0) {
       throw new ConflictException({
-        message: `${this.model.name}  with this data already exists`,
+        message: `${this.model.name} with this data already exists`,
         duplicateFields,
       });
     }
@@ -35,7 +79,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
 
   async create(data: CreateInput) {
     try {
-      await this.validateUniqueField(data);
+      await this.validateUniqueField(null, data, ['description']);
       const createdData = await this.model.create({ data });
 
       return {
@@ -43,7 +87,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
         data: createdData,
       };
     } catch (error) {
-      handleError(error);
+      handleError(error, null, this.model.name);
     }
   }
 
@@ -56,7 +100,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
         data: existingData,
       };
     } catch (error) {
-      handleError(error);
+      handleError(error, null, this.model.name);
     }
   }
 
@@ -75,18 +119,20 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
         data: existingData,
       };
     } catch (error) {
-      handleError(error);
+      handleError(error, id, this.model.name);
     }
   }
 
   async update(id: number, data: UpdateInput) {
     try {
-      const existingData = await this.model.findUnique({ where: { id } });
-      if (!existingData) {
-        throw new NotFoundException(
-          `${this.model.name} with ID ${id} not found`,
-        );
-      }
+      // const existingData = await this.model.findUnique({ where: { id } });
+      // if (!existingData) {
+      //   throw new NotFoundException(
+      //     `${this.model.name} with ID ${id} not found`,
+      //   );
+      // }
+
+      await this.validateUniqueField(id, data, ['description']);
 
       const updatedExistingData = await this.model.update({
         where: { id },
@@ -98,7 +144,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
         data: updatedExistingData,
       };
     } catch (error) {
-      handleError(error);
+      handleError(error, id, this.model.name);
     }
   }
 
@@ -111,7 +157,7 @@ export abstract class BaseService<T, CreateInput, UpdateInput> {
         data: deletedExistingData,
       };
     } catch (error) {
-      handleError(error, id);
+      handleError(error, id, this.model.name);
     }
   }
 }

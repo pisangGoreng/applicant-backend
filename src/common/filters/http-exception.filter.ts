@@ -12,13 +12,10 @@ export class ConflictExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
-
-    console.log('masuk ke sini');
-
-    // * Extract the response details
-    const { message, duplicateFields } = exception.getResponse() as any;
+    const { message, duplicateFields } = exception.getResponse() as any; // * Extract the response details
 
     response.status(status).json({
+      error: true,
       statusCode: status,
       message,
       duplicateFields,

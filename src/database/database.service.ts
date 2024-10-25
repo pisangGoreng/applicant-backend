@@ -53,7 +53,7 @@ export class DatabaseService extends PrismaClient implements OnModuleInit {
 
         return next(params);
       } catch (error) {
-        handleError(error);
+        handleError(error, null, 'ApplicantStatus');
       }
     });
   }

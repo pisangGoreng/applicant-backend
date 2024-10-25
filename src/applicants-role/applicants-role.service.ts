@@ -10,7 +10,9 @@ export class ApplicantsRoleService extends BaseService<
   Prisma.ApplicantRoleCreateInput,
   Prisma.ApplicantRoleUpdateInput
 > {
+  public uniqueFieldsModel: string[];
   constructor(databaseService: DatabaseService) {
-    super(databaseService, databaseService.applicantRole);
+    super(databaseService, databaseService.applicantRole, ['description']);
+    this.uniqueFieldsModel = ['description'];
   }
 }

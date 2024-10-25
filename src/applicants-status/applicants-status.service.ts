@@ -9,7 +9,9 @@ export class ApplicantsStatusService extends BaseService<
   Prisma.ApplicantStatusCreateInput,
   Prisma.ApplicantStatusUpdateInput
 > {
+  public uniqueFieldsModel: string[];
   constructor(databaseService: DatabaseService) {
-    super(databaseService, databaseService.applicantStatus);
+    super(databaseService, databaseService.applicantStatus, ['description']);
+    this.uniqueFieldsModel = ['description'];
   }
 }

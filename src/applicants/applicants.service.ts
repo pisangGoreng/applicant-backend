@@ -1,49 +1,43 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Applicant, Prisma } from '@prisma/client';
 import { DatabaseService } from 'src/database/database.service';
 import { GetApplicantsDto } from './dto/get-applicants.dto';
 import { handleError } from 'src/common/utils/error-handler';
+import { BaseService } from 'src/common/services/base.service';
+// import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { ApplicantsRoleService } from 'src/applicants-role/applicants-role.service';
 
 @Injectable()
-export class ApplicantsService {
-  constructor(private readonly databaseService: DatabaseService) {}
+export class ApplicantsService extends BaseService<
+  Applicant,
+  Prisma.ApplicantCreateInput,
+  Prisma.ApplicantUpdateInput
+> {
+  public uniqueFieldsModel: string[];
 
-  async validateUniqueField(createApplicant: Prisma.ApplicantCreateInput) {
-    const { email, phoneNumber } = createApplicant;
-    const existingApplicant = await this.databaseService.applicant.findFirst({
-      where: {
-        OR: [{ email }, { phoneNumber }],
-      },
-    });
-
-    const duplicateFields: string[] = [];
-    if (existingApplicant?.email === email) duplicateFields.push('email');
-    if (existingApplicant?.phoneNumber === phoneNumber)
-      duplicateFields.push('phoneNumber');
-
-    if (duplicateFields.length > 0) {
-      throw new ConflictException({
-        message: 'Applicant with this data already exists.',
-        duplicateFields,
-      });
-    }
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly applicantRoleService: ApplicantsRoleService,
+  ) {
+    super(databaseService, databaseService.applicant, ['email', 'phoneNumber']);
+    this.uniqueFieldsModel = ['email', 'phoneNumber'];
   }
 
   async create(createApplicant: Prisma.ApplicantCreateInput) {
     try {
-      await this.validateUniqueField(createApplicant);
       const { applicantRole } = createApplicant;
+      await this.validateUniqueField(
+        null,
+        createApplicant,
+        this.uniqueFieldsModel,
+      );
 
-      const isRoleExist = await this.databaseService.applicantRole.findUnique({
-        where: { id: Number(applicantRole) },
-      });
-      if (!isRoleExist) {
-        throw new NotFoundException(`Role with ID ${applicantRole} not found`);
-      }
+      await this.applicantRoleService.findOne(Number(applicantRole));
 
       const createdApplicant = await this.databaseService.applicant.create({
         data: {
@@ -59,23 +53,20 @@ export class ApplicantsService {
         data: createdApplicant,
       };
     } catch (error) {
-      handleError(error);
+      handleError(error, null, 'Applicant');
     }
   }
 
-  async findAll(query: GetApplicantsDto) {
+  async findAllByQuery(query: GetApplicantsDto) {
     try {
       const { page, limit, applicantRole, applicantStatus, location } = query;
-
       const filter: Prisma.ApplicantWhereInput = {};
       if (applicantRole) {
         filter.applicantRole = { description: { contains: applicantRole } };
       }
-
       if (applicantStatus) {
         filter.applicantStatus = { description: { contains: applicantStatus } };
       }
-
       if (location) {
         filter.location = { contains: location };
       }
@@ -101,7 +92,7 @@ export class ApplicantsService {
         data: applicants,
       };
     } catch (error) {
-      handleError(error);
+      handleError(error, null, 'Applicant');
     }
   }
 
@@ -126,21 +117,20 @@ export class ApplicantsService {
         data: existingApplicant,
       };
     } catch (error) {
-      handleError(error);
+      handleError(error, id, 'Applicant');
     }
   }
 
   async update(id: number, updateApplicant: Prisma.ApplicantUpdateInput) {
     try {
       const { applicantRole, applicantStatus } = updateApplicant;
-      const { applicant } = this.databaseService;
+      await this.validateUniqueField(
+        id,
+        updateApplicant,
+        this.uniqueFieldsModel,
+      );
 
-      const existingApplicant = await applicant.findUnique({ where: { id } });
-      if (!existingApplicant) {
-        throw new NotFoundException(`Applicant with ID ${id} not found`);
-      }
-
-      const updatedApplicant = await applicant.update({
+      const updatedApplicant = await this.databaseService.applicant.update({
         where: { id },
         data: {
           ...updateApplicant,
@@ -158,22 +148,46 @@ export class ApplicantsService {
         data: updatedApplicant,
       };
     } catch (error) {
-      handleError(error);
-    }
-  }
-
-  async remove(id: number) {
-    try {
-      const deletedApplicant = await this.databaseService.applicant.delete({
-        where: { id },
-      });
-
-      return {
-        message: 'Applicant deleted successfully',
-        data: deletedApplicant,
-      };
-    } catch (error) {
-      handleError(error, id);
+      handleError(error, id, 'Applicant');
     }
   }
 }
+
+// async validateUniqueField(
+//   id,
+//   updateApplicant: Prisma.ApplicantUpdateInput | Prisma.ApplicantCreateInput,
+//   uniqueFields: string[],
+// ) {
+//   const [conditions, conditionsValue] = Object.entries(
+//     updateApplicant,
+//   ).reduce(
+//     (results, [key, value]) => {
+//       if (uniqueFields.includes(key)) {
+//         results[0].push({ [key]: value });
+//         results[1].push(value);
+//       }
+//       return results;
+//     },
+//     [[], []],
+//   );
+
+//   const existingApplicant = await this.databaseService.applicant.findMany({
+//     where: { OR: conditions, ...(id && { NOT: { id } }) },
+//   });
+
+//   const duplicateFields = existingApplicant.reduce((results, item) => {
+//     Object.entries(item).forEach(([key, value]) => {
+//       if (conditionsValue.includes(value)) {
+//         results.push(key);
+//       }
+//     });
+//     return results;
+//   }, []);
+
+//   if (duplicateFields.length > 0) {
+//     throw new ConflictException({
+//       message: 'Applicant with this data already exists.',
+//       duplicateFields,
+//     });
+//   }
+// }

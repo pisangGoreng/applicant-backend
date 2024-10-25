@@ -23,7 +23,7 @@ export class ApplicantsController {
 
   @Get()
   findAll(@Query() queryPagination: GetApplicantsDto) {
-    return this.applicantsService.findAll(queryPagination);
+    return this.applicantsService.findAllByQuery(queryPagination);
   }
 
   @Get(':id')
