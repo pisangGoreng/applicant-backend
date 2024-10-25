@@ -42,11 +42,6 @@ export class ApplicantsService extends BaseService<
           }),
         },
       });
-
-      // return {
-      //   message: 'Applicant created successfully',
-      //   data: createdApplicant,
-      // };
     } catch (error) {
       handleError(error, null, 'Applicant');
     }
@@ -55,6 +50,7 @@ export class ApplicantsService extends BaseService<
   async findAllByQuery(query: GetApplicantsDto) {
     try {
       const { page, limit, applicantRole, applicantStatus, location } = query;
+      const limitNum = limit ? limit : undefined;
       const filter: Prisma.ApplicantWhereInput = {};
       if (applicantRole) {
         filter.applicantRole = { description: { contains: applicantRole } };
@@ -70,13 +66,12 @@ export class ApplicantsService extends BaseService<
         this.databaseService.applicant.count({ where: filter }),
         this.databaseService.applicant.findMany({
           where: filter,
-          skip: (page - 1) * limit,
-          take: limit,
           orderBy: { createdAt: 'desc' },
           include: {
             applicantRole: true,
             applicantStatus: true,
           },
+          ...(limitNum ? { skip: (page - 1) * limitNum, take: limitNum } : {}),
         }),
       ]);
 

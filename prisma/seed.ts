@@ -67,7 +67,7 @@ async function main() {
   });
 
   // Seed Applicants
-  const applicants = Array.from({ length: 10 }).map(() => ({
+  const applicants = Array.from({ length: 45 }).map(() => ({
     name: faker.name.fullName(),
     email: faker.internet.email(),
     phoneNumber: faker.phone.number({ style: 'national' }),
