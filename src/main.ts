@@ -10,9 +10,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.useGlobalFilters(new ConflictExceptionFilter());
-
-  // * Apply global filters and interceptors
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.enableCors({ origin: '*' });
 
   app.useLogger(app.get(Logger));
 

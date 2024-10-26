@@ -1,0 +1,368 @@
+{
+	"info": {
+		"_postman_id": "bfc1f9b7-5269-47a0-8016-60ffc4ce3657",
+		"name": "applicant-backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2284587"
+	},
+	"item": [
+		{
+			"name": "applicants",
+			"item": [
+				{
+					"name": "get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/applicants?page=2&limit=2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2"
+								},
+								{
+									"key": "limit",
+									"value": "2"
+								},
+								{
+									"key": "applicantRole",
+									"value": "ware",
+									"disabled": true
+								},
+								{
+									"key": "applicantStatus",
+									"value": "applied",
+									"disabled": true
+								},
+								{
+									"key": "location",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"sijrjjkknjjkjjunp@gmail.com\",\n    \"name\": \"bambanf\",\n    \"phoneNumber\": \"01akjjknjjnkj8jj82j1k83k10338779w8\",\n    \"yoe\": 5,\n    \"location\": \"Jakarta\",\n    \"resumeLink\": \"\",\n    \"applicantRole\": 31\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/applicants",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/applicants/120",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants",
+								"120"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update by id",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    // \"email\": \"Maryjane.Durgan@gmail.com\",\n    \"name\": \"irwin pratajaya\",\n    // \"phoneNumber\": \"(726) 451-8778\",\n    // \"yoe\": 5,\n    // \"location\": \"Jakarta\",\n    // \"resumeLink\": \"\",\n    \"applicantRole\": 62\n    // \"applicantStatus\": 38 \n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/applicants/42",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants",
+								"42"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete by id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/applicants/120",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants",
+								"120"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "applicants-role",
+			"item": [
+				{
+					"name": "get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/applicants-role",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants-role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"Music\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/applicants-role",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants-role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/applicants-role/78",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants-role",
+								"78"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update by id",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"Drummer\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/applicants-role/78",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants-role",
+								"78"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete by id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/applicants-role/78",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants-role",
+								"78"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "applicants-status",
+			"item": [
+				{
+					"name": "get all",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/applicants-status",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants-status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"Unknown\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/applicants-status",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants-status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/applicants-status/47",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants-status",
+								"47"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update by id",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"missing\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/applicants-status/48",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants-status",
+								"48"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete by id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/applicants-status/48",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"applicants-status",
+								"48"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
